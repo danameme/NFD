@@ -169,6 +169,7 @@ EthernetFactory::createFace(const CreateFaceRequest& req,
                             const FaceCreatedCallback& onCreated,
                             const FaceCreationFailedCallback& onFailure)
 {
+
   BOOST_ASSERT(req.remoteUri.isCanonical());
 
   if (!req.localUri || req.localUri->getScheme() != "dev") {

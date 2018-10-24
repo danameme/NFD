@@ -132,7 +132,9 @@ FaceManager::createFace(const Name& topPrefix, const Interest& interest,
   if (parameters.hasFlagBit(ndn::nfd::BIT_CONGESTION_MARKING_ENABLED)) {
     faceParams.wantCongestionMarking = parameters.getFlagBit(ndn::nfd::BIT_CONGESTION_MARKING_ENABLED);
   }
+
   try {
+
     factory->createFace({remoteUri, localUri, faceParams},
                         bind(&FaceManager::afterCreateFaceSuccess, this, parameters, _1, done),
                         bind(&FaceManager::afterCreateFaceFailure, this, _1, _2, done));

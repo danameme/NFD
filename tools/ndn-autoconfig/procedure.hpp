@@ -62,6 +62,9 @@ public:
     return m_face.getIoService();
   }
 
+  void
+  setLocalInterface(std::string localInterface);
+
 private:
   VIRTUAL_WITH_TESTS void
   makeStages(const Options& options);
@@ -86,6 +89,7 @@ private:
   Face& m_face;
   KeyChain& m_keyChain;
   nfd::Controller m_controller;
+  std::string m_localInterface;
 };
 
 } // namespace autoconfig

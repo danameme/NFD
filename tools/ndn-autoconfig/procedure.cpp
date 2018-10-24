@@ -29,6 +29,11 @@
 #include "multicast-discovery.hpp"
 #include "ndn-fch-discovery.hpp"
 
+#include <string> 
+
+
+using namespace std;
+
 namespace ndn {
 namespace tools {
 namespace autoconfig {
@@ -87,12 +92,29 @@ Procedure::connect(const FaceUri& hubFaceUri)
 {
   hubFaceUri.canonize(
     [this] (const FaceUri& canonicalUri) {
+
+      //Supply LocalUri if ethernet protocol is used for face creation
+      std::string strLocalUri = "";
+      std::string remoteUri = canonicalUri.toString();
+      ControlParameters conParams;
+
+
+      if (remoteUri.substr(0,5) == "ether") {
+	strLocalUri = strLocalUri + "dev://" + m_localInterface;
+        conParams.setUri(canonicalUri.toString()).setLocalUri(strLocalUri);
+      }
+      else {
+	conParams.setUri(canonicalUri.toString());
+      }
+
       m_controller.start<nfd::FaceCreateCommand>(
-        ControlParameters().setUri(canonicalUri.toString()),
+        //ControlParameters().setUri(canonicalUri.toString()).setLocalUri(strLocalUri),
+        conParams,
         [this] (const ControlParameters& params) {
           std::cerr << "Connected to HUB " << params.getUri() << std::endl;
           this->registerPrefixes(params.getFaceId());
         },
+	
         [this, canonicalUri] (const ControlResponse& resp) {
           if (resp.getCode() == 409) {
             ControlParameters params(resp.getBody());
@@ -137,6 +159,13 @@ Procedure::registerPrefixes(uint64_t hubFaceId, size_t index)
       this->onComplete(false);
     });
 }
+
+void
+Procedure::setLocalInterface(std::string localInterface)
+{
+	m_localInterface = localInterface;
+}
+
 
 } // namespace autoconfig
 } // namespace tools

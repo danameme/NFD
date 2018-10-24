@@ -111,6 +111,9 @@ main(int argc, char** argv)
   bool isDaemon = false;
   std::string configFile;
 
+  //Accept ethernet interface name as option
+  std::string localInterface; 
+
   po::options_description optionsDescription("Options");
   optionsDescription.add_options()
     ("help,h", "print this message and exit")
@@ -123,6 +126,8 @@ main(int argc, char** argv)
      "URL for NDN-FCH (Find Closest Hub) service")
     ("config,c", po::value<std::string>(&configFile),
      "Configuration file. Exit immediately unless 'enabled = true' is specified in the config file.")
+    ("inf,i", po::value<std::string>(&localInterface),
+     "Specify local ethernet interface. Used as local FaceUri to create face to hub")
     ;
 
   po::variables_map vm;
@@ -171,6 +176,9 @@ main(int argc, char** argv)
     KeyChain keyChain;
     Procedure proc(face, keyChain);
     proc.initialize(options);
+
+    //Send the interface name specified at the command line
+    proc.setLocalInterface(localInterface);
 
     if (isDaemon) {
       runDaemon(proc);
