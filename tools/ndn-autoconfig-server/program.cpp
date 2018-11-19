@@ -28,6 +28,7 @@
 #include <ndn-cxx/encoding/block-helpers.hpp>
 #include <ndn-cxx/encoding/tlv.hpp>
 #include <ndn-cxx/encoding/tlv-nfd.hpp>
+#include <ndn-cxx/encoding/tlv.hpp>
 
 #include <iostream>
 
@@ -38,6 +39,8 @@ namespace autoconfig_server {
 static const Name HUB_DATA_NAME("/localhop/ndn-autoconf/hub");
 static const Name ROUTABLE_PREFIXES_DATA_PREFIX("/localhop/nfd");
 static const PartialName ROUTABLE_PREFIXES_DATA_SUFFIX("rib/routable-prefixes");
+
+static const Name CA_NAMESPACE("/ndn/nmsu/cs/sh/ap11");
 
 Program::Program(const Options& options, Face& face, KeyChain& keyChain)
   : m_face(face)
@@ -55,6 +58,15 @@ Program::enableHubData(const FaceUri& hubFaceUri)
 {
   std::string uri = hubFaceUri.toString();
 
+  // Add certificate namespace info to URI string
+  uri = uri + "/[" + CA_NAMESPACE.toUri() + "]";
+
+  // Register certificate namespace
+  m_face.registerPrefix(CA_NAMESPACE,
+    nullptr,
+    bind(&Program::handlePrefixRegistrationFailure, this, _1, _2));
+
+
   auto data = make_shared<Data>(Name(HUB_DATA_NAME).appendVersion());
   data->setFreshnessPeriod(time::hours(1));
   data->setContent(makeBinaryBlock(tlv::nfd::Uri,
@@ -62,7 +74,7 @@ Program::enableHubData(const FaceUri& hubFaceUri)
   m_keyChain.sign(*data);
 
   m_face.setInterestFilter(HUB_DATA_NAME,
-    [this, data] (const Name&, const Interest& interest) {
+    [this, data] (const Name&, const Interest& interest) { 
       if (interest.matchesData(*data)) {
         m_face.put(*data);
       }

@@ -65,6 +65,12 @@ public:
   void
   setLocalInterface(std::string localInterface);
 
+  std::string
+  getCertNamespaces(std::string, std::string);
+
+  void
+  writeToFile(std::string);
+
 private:
   VIRTUAL_WITH_TESTS void
   makeStages(const Options& options);
@@ -90,6 +96,7 @@ private:
   KeyChain& m_keyChain;
   nfd::Controller m_controller;
   std::string m_localInterface;
+  std::string m_remoteUri;
 };
 
 } // namespace autoconfig

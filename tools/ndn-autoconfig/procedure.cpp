@@ -30,7 +30,9 @@
 #include "ndn-fch-discovery.hpp"
 
 #include <string> 
-
+#include <ndn-cxx/encoding/tlv-nfd.hpp>
+#include <ndn-cxx/encoding/tlv.hpp>
+#include <fstream>
 
 using namespace std;
 
@@ -45,6 +47,9 @@ static const time::nanoseconds FACEURI_CANONIZE_TIMEOUT = time::seconds(4);
 static const std::vector<Name> HUB_PREFIXES{"/", "/localhop/nfd"};
 static const nfd::RouteOrigin HUB_ROUTE_ORIGIN = nfd::ROUTE_ORIGIN_AUTOCONF;
 static const uint64_t HUB_ROUTE_COST = 100;
+
+
+static const time::milliseconds CA_REQUEST_INTEREST_LIFETIME = time::seconds(4);
 
 Procedure::Procedure(Face& face, KeyChain& keyChain)
   : m_face(face)
@@ -62,6 +67,7 @@ Procedure::initialize(const Options& options)
 
   for (size_t i = 0; i < m_stages.size(); ++i) {
     m_stages[i]->onSuccess.connect(bind(&Procedure::connect, this, _1));
+
     if (i + 1 < m_stages.size()) {
       m_stages[i]->onFailure.connect([=] (const std::string&) { m_stages[i + 1]->start(); });
     }
@@ -96,9 +102,9 @@ Procedure::connect(const FaceUri& hubFaceUri)
       //Supply LocalUri if ethernet protocol is used for face creation
       std::string strLocalUri = "";
       std::string remoteUri = canonicalUri.toString();
+      m_remoteUri = remoteUri;
+
       ControlParameters conParams;
-
-
       if (remoteUri.substr(0,5) == "ether") {
 	strLocalUri = strLocalUri + "dev://" + m_localInterface;
         conParams.setUri(canonicalUri.toString()).setLocalUri(strLocalUri);
@@ -113,6 +119,11 @@ Procedure::connect(const FaceUri& hubFaceUri)
         [this] (const ControlParameters& params) {
           std::cerr << "Connected to HUB " << params.getUri() << std::endl;
           this->registerPrefixes(params.getFaceId());
+
+	  std::string certNamespace = this->getCertNamespaces(params.getUri(), MulticastDiscovery::m_CERT_NAMESPACE);
+	  this->writeToFile(certNamespace);
+	  std::cerr << "CA Namespace: " << certNamespace << std::endl;
+	
         },
 	
         [this, canonicalUri] (const ControlResponse& resp) {
@@ -133,6 +144,7 @@ Procedure::connect(const FaceUri& hubFaceUri)
       this->onComplete(false);
     },
     m_face.getIoService(), FACEURI_CANONIZE_TIMEOUT);
+
 }
 
 void
@@ -158,12 +170,32 @@ Procedure::registerPrefixes(uint64_t hubFaceId, size_t index)
                 << resp.getText() << " (" << resp.getCode() << ")" << std::endl;
       this->onComplete(false);
     });
+
 }
 
 void
 Procedure::setLocalInterface(std::string localInterface)
 {
 	m_localInterface = localInterface;
+}
+
+std::string
+Procedure::getCertNamespaces(std::string strFaceUri, std::string strTemp)
+{
+	std::string strCertNamespaces = "";
+	strCertNamespaces = strTemp.substr((strFaceUri.length() + 2), (strTemp.length() - 1 - ((strFaceUri.length() + 2)))); 
+	
+	return strCertNamespaces;
+}
+
+void
+Procedure::writeToFile(std::string strCertNamespace)
+{
+	ofstream myof;
+        myof.open ("certnamespace.txt");
+  	myof << strCertNamespace;
+	myof << "\n";
+	myof.close();
 }
 
 

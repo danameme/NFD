@@ -62,6 +62,9 @@ public:
     return STAGE_NAME;
   }
 
+public:
+  static std::string m_CERT_NAMESPACE;
+
 private:
   void
   doStart() final;
@@ -85,6 +88,7 @@ private:
   int m_nRegs = 0;
   int m_nRegSuccess = 0;
   int m_nRegFailure = 0;
+
 };
 
 } // namespace autoconfig

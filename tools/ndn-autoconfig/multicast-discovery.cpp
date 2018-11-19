@@ -39,6 +39,8 @@ static const uint64_t HUB_DISCOVERY_ROUTE_COST(1);
 static const time::milliseconds HUB_DISCOVERY_ROUTE_EXPIRATION = time::seconds(30);
 static const time::milliseconds HUB_DISCOVERY_INTEREST_LIFETIME = time::seconds(4);
 
+std::string MulticastDiscovery::m_CERT_NAMESPACE = "";
+
 MulticastDiscovery::MulticastDiscovery(Face& face, nfd::Controller& controller)
   : m_face(face)
   , m_controller(controller)
@@ -143,6 +145,9 @@ MulticastDiscovery::requestHubData()
       }
 
       this->provideHubFaceUri(std::string(reinterpret_cast<const char*>(i->value()), i->value_size()));
+
+      MulticastDiscovery::m_CERT_NAMESPACE = std::string(reinterpret_cast<const char*>(i->value()), i->value_size());
+
     },
     [this] (const Interest&, const lp::Nack& nack) {
       this->fail("Nack-" + boost::lexical_cast<std::string>(nack.getReason()) + " when retrieving hub Data");
@@ -151,6 +156,7 @@ MulticastDiscovery::requestHubData()
       this->fail("Timeout when retrieving hub Data");
     });
 }
+
 
 } // namespace autoconfig
 } // namespace tools
