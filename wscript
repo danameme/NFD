@@ -160,7 +160,7 @@ def build(bld):
 
     bld.objects(
         target='core-objects',
-        features='pch',
+	features=['pch', 'cxx', 'cxxshlib'],
         source=bld.path.ant_glob('core/**/*.cpp'),
         use='version.hpp NDN_CXX BOOST LIBRT',
         includes='.',
@@ -230,6 +230,20 @@ def build(bld):
         bld.symlink_as('${MANDIR}/man1/nfdc-unset-strategy.1', 'nfdc-strategy.1')
 
     bld.install_files('${SYSCONFDIR}/ndn', 'autoconfig.conf.sample')
+
+    bld.shlib(source=[
+        "tools/ndn-autoconfig/main.cpp",
+        "tools/ndn-autoconfig/procedure.cpp",
+        "tools/ndn-autoconfig/stage.cpp",
+        "tools/ndn-autoconfig/multicast-discovery.cpp",
+        "tools/ndn-autoconfig/guess-from-search-domains.cpp",
+        "tools/ndn-autoconfig/ndn-fch-discovery.cpp",
+        "tools/ndn-autoconfig/guess-from-identity-name.cpp",
+        "tools/ndn-autoconfig/dns-srv.cpp",
+        "tools/ndn-autoconfig/c-wrapper.cpp"
+	], 
+	target="autodiscoverycwrapper", includes=["tools"], cxxflags="-g -Wall -O0", 
+	use=["core-objects"])
 
 def docs(bld):
     from waflib import Options

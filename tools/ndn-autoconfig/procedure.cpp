@@ -120,6 +120,7 @@ Procedure::connect(const FaceUri& hubFaceUri)
           std::cerr << "Connected to HUB " << params.getUri() << std::endl;
           this->registerPrefixes(params.getFaceId());
 
+	  //Get cert namespace from URI 
 	  std::string certNamespace = this->getCertNamespaces(params.getUri(), MulticastDiscovery::m_CERT_NAMESPACE);
 	  this->writeToFile(certNamespace);
 	  std::cerr << "CA Namespace: " << certNamespace << std::endl;
@@ -131,6 +132,12 @@ Procedure::connect(const FaceUri& hubFaceUri)
             ControlParameters params(resp.getBody());
             std::cerr << "Already connected to HUB " << params.getUri() << std::endl;
             this->registerPrefixes(params.getFaceId());
+
+	    //Get cert namespace from URI 
+            std::string certNamespace = this->getCertNamespaces(params.getUri(), MulticastDiscovery::m_CERT_NAMESPACE);
+            this->writeToFile(certNamespace);
+            std::cerr << "CA Namespace: " << certNamespace << std::endl;
+
           }
           else {
             std::cerr << "Failed to connect to HUB " << canonicalUri << ": "

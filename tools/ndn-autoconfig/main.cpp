@@ -38,6 +38,8 @@
 #include <ndn-cxx/util/scheduler-scoped-event-id.hpp>
 #include <ndn-cxx/util/time.hpp>
 
+#include "invoke-client.hpp"
+
 // suppress warning caused by boost::program_options::parse_config_file
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wundefined-func-template"
@@ -45,6 +47,10 @@
 
 // ndn-autoconfig is an NDN tool not an NFD tool, so it uses ndn::tools::autoconfig namespace.
 // It lives in NFD repository because nfd-start can automatically start ndn-autoconfig in daemon mode.
+
+//Declare function parameters as global variables
+std::string m_interface_name;
+
 namespace ndn {
 namespace tools {
 namespace autoconfig {
@@ -105,7 +111,8 @@ runDaemon(Procedure& proc)
 }
 
 static int
-main(int argc, char** argv)
+//main(int argc, char** argv)
+main()
 {
   Options options;
   bool isDaemon = false;
@@ -130,10 +137,12 @@ main(int argc, char** argv)
      "Specify local ethernet interface. Used as local FaceUri to create face to hub")
     ;
 
+/* Disables command line argument parser
   po::variables_map vm;
   try {
     po::store(po::parse_command_line(argc, argv, optionsDescription), vm);
     po::notify(vm);
+
   }
   catch (const std::exception& e) {
     std::cerr << "ERROR: " << e.what() << "\n\n";
@@ -169,6 +178,7 @@ main(int argc, char** argv)
       return 0;
     }
   }
+*/
 
   int exitCode = 0;
   try {
@@ -177,7 +187,8 @@ main(int argc, char** argv)
     Procedure proc(face, keyChain);
     proc.initialize(options);
 
-    //Send the interface name specified at the command line
+    //Send the interface name specified
+    localInterface = m_interface_name;
     proc.setLocalInterface(localInterface);
 
     if (isDaemon) {
@@ -201,8 +212,22 @@ main(int argc, char** argv)
 } // namespace tools
 } // namespace ndn
 
+
+//Define class method that starts client's main function call
+InvokeClient::InvokeClient() {
+}
+
+int InvokeClient::CallClientMain(std::string p_interface_name) {
+
+        m_interface_name = p_interface_name;
+	return ndn::tools::autoconfig::main();
+}
+//End of class method definitions
+
 int
 main(int argc, char** argv)
 {
-  return ndn::tools::autoconfig::main(argc, argv);
+	InvokeClient cl;
+	return cl.CallClientMain("enp0s8");
+  //return ndn::tools::autoconfig::main(argc, argv);
 }

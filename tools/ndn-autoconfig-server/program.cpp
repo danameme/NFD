@@ -41,6 +41,9 @@ static const Name ROUTABLE_PREFIXES_DATA_PREFIX("/localhop/nfd");
 static const PartialName ROUTABLE_PREFIXES_DATA_SUFFIX("rib/routable-prefixes");
 
 static const Name CA_NAMESPACE("/ndn/nmsu/cs/sh/ap11");
+//static const Name CA_NAMESPACE("/ndn");
+
+
 
 Program::Program(const Options& options, Face& face, KeyChain& keyChain)
   : m_face(face)
