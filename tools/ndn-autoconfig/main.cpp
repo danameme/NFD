@@ -50,6 +50,9 @@
 
 //Declare function parameters as global variables
 std::string m_interface_name;
+int m_argc;
+char** m_argv;
+
 
 namespace ndn {
 namespace tools {
@@ -119,7 +122,7 @@ main()
   std::string configFile;
 
   //Accept ethernet interface name as option
-  std::string localInterface; 
+  std::string localInterface = ""; 
 
   po::options_description optionsDescription("Options");
   optionsDescription.add_options()
@@ -137,21 +140,25 @@ main()
      "Specify local ethernet interface. Used as local FaceUri to create face to hub")
     ;
 
-/* Disables command line argument parser
+
   po::variables_map vm;
   try {
-    po::store(po::parse_command_line(argc, argv, optionsDescription), vm);
+    po::store(po::parse_command_line(m_argc, m_argv, optionsDescription), vm);
     po::notify(vm);
 
   }
   catch (const std::exception& e) {
     std::cerr << "ERROR: " << e.what() << "\n\n";
-    usage(std::cerr, optionsDescription, argv[0]);
+    usage(std::cerr, optionsDescription, m_argv[0]);
     return 2;
   }
 
+  if (vm.count("inf")) {
+	//Saves the interface name from command line
+  }
+
   if (vm.count("help")) {
-    usage(std::cout, optionsDescription, argv[0]);
+    usage(std::cout, optionsDescription, m_argv[0]);
     return 0;
   }
 
@@ -178,7 +185,6 @@ main()
       return 0;
     }
   }
-*/
 
   int exitCode = 0;
   try {
@@ -188,7 +194,9 @@ main()
     proc.initialize(options);
 
     //Send the interface name specified
-    localInterface = m_interface_name;
+    if (localInterface == "") {
+    	localInterface = m_interface_name;
+    }
     proc.setLocalInterface(localInterface);
 
     if (isDaemon) {
@@ -227,7 +235,10 @@ int InvokeClient::CallClientMain(std::string p_interface_name) {
 int
 main(int argc, char** argv)
 {
+	m_argc = argc;
+	m_argv = argv;
+
 	InvokeClient cl;
-	return cl.CallClientMain("enp0s8");
-  //return ndn::tools::autoconfig::main(argc, argv);
+	return cl.CallClientMain("eth0");
+  	//return ndn::tools::autoconfig::main(argc, argv);
 }

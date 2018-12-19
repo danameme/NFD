@@ -141,7 +141,7 @@ Procedure::connect(const FaceUri& hubFaceUri)
           }
           else {
             std::cerr << "Failed to connect to HUB " << canonicalUri << ": "
-                      << resp.getText() << " (" << resp.getCode() << ")" << std::endl;
+                      << resp.getText() << " (" << resp.getCode() << ")" << " using local interface " << m_localInterface << std::endl;
             this->onComplete(false);
           }
         });
