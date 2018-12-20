@@ -40,10 +40,8 @@ static const Name HUB_DATA_NAME("/localhop/ndn-autoconf/hub");
 static const Name ROUTABLE_PREFIXES_DATA_PREFIX("/localhop/nfd");
 static const PartialName ROUTABLE_PREFIXES_DATA_SUFFIX("rib/routable-prefixes");
 
-static const Name CA_NAMESPACE("/ndn/nmsu/cs/sh/ap11");
-//static const Name CA_NAMESPACE("/ndn");
-
-
+//Initialize static member
+std::string Program::m_CA_PREFIX = "";
 
 Program::Program(const Options& options, Face& face, KeyChain& keyChain)
   : m_face(face)
@@ -60,6 +58,8 @@ void
 Program::enableHubData(const FaceUri& hubFaceUri)
 {
   std::string uri = hubFaceUri.toString();
+  
+  static const Name CA_NAMESPACE(Program::m_CA_PREFIX);
 
   // Add certificate namespace info to URI string
   uri = uri + "/[" + CA_NAMESPACE.toUri() + "]";
@@ -110,6 +110,7 @@ Program::handlePrefixRegistrationFailure(const Name& prefix, const std::string& 
             << " (" << reason << ")" << std::endl;
   m_face.shutdown();
 }
+
 
 } // namespace autoconfig_server
 } // namespace tools

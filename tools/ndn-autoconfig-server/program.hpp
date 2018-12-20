@@ -52,6 +52,9 @@ public:
     m_face.processEvents();
   }
 
+public:
+  static std::string m_CA_PREFIX;
+
 private:
   void
   enableHubData(const FaceUri& hubFaceUri);
@@ -66,6 +69,7 @@ private:
   Face& m_face;
   KeyChain& m_keyChain;
   mgmt::Dispatcher m_dispatcher;
+  std::string m_ca_prefix;
 };
 
 } // namespace autoconfig_server

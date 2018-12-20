@@ -34,6 +34,8 @@ namespace ndn {
 namespace tools {
 namespace autoconfig_server {
 
+std::string m_local_prefix;
+
 static void
 usage(const char* programName)
 {
@@ -62,6 +64,7 @@ main(int argc, char** argv)
       return 0;
     case 'p':
       options.routablePrefixes.emplace_back(::optarg);
+      m_local_prefix = argv[2];
       break;
     default:
       usage(argv[0]);
@@ -82,6 +85,7 @@ main(int argc, char** argv)
   try {
     Face face;
     KeyChain keyChain;
+    Program::m_CA_PREFIX = m_local_prefix;
     Program program(options, face, keyChain);
     program.run();
   }
