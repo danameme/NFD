@@ -65,9 +65,9 @@ Program::enableHubData(const FaceUri& hubFaceUri)
   uri = uri + "/[" + CA_NAMESPACE.toUri() + "]";
 
   // Register certificate namespace
-  m_face.registerPrefix(CA_NAMESPACE,
-    nullptr,
-    bind(&Program::handlePrefixRegistrationFailure, this, _1, _2));
+  //m_face.registerPrefix(CA_NAMESPACE,
+    //nullptr,
+    //bind(&Program::handlePrefixRegistrationFailure, this, _1, _2));
 
 
   auto data = make_shared<Data>(Name(HUB_DATA_NAME).appendVersion());
