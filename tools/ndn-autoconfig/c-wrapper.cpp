@@ -7,7 +7,8 @@ extern "C" {
 		return new InvokeClient();
 	}
 
-        int InvokeClient_Auto_Discovery(InvokeClient* v, char* p_interface_name) {
+	const char*
+	InvokeClient_Auto_Discovery(InvokeClient* v, char* p_interface_name) {
 		return v->CallClientMain(p_interface_name);
 	}
 

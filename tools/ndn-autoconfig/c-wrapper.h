@@ -10,7 +10,8 @@ extern "C" {
 
 	InvokeClient* newInvokeClient();
 
-	int InvokeClient_Auto_Discovery(InvokeClient* v, char* p_interface_name);
+	const char*
+	InvokeClient_Auto_Discovery(InvokeClient* v, char* p_interface_name);
 
 #ifdef __cplusplus
 }

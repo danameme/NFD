@@ -120,10 +120,9 @@ Procedure::connect(const FaceUri& hubFaceUri)
           std::cerr << "Connected to HUB " << params.getUri() << std::endl;
           this->registerPrefixes(params.getFaceId());
 
-	  //Get cert namespace from URI 
-	  std::string certNamespace = this->getCertNamespaces(params.getUri(), MulticastDiscovery::m_CERT_NAMESPACE);
-	  this->writeToFile(certNamespace);
-	  std::cerr << "CA Namespace: " << certNamespace << std::endl;
+	  //Set and get certificate namespace from URI 
+	  this->setCertNamespaces(params.getUri(), MulticastDiscovery::m_CERT_NAMESPACE);
+	  std::cerr << "CA Namespace: " << this->getCertNamespaces() << std::endl;
 	
         },
 	
@@ -133,10 +132,9 @@ Procedure::connect(const FaceUri& hubFaceUri)
             std::cerr << "Already connected to HUB " << params.getUri() << std::endl;
             this->registerPrefixes(params.getFaceId());
 
-	    //Get cert namespace from URI 
-            std::string certNamespace = this->getCertNamespaces(params.getUri(), MulticastDiscovery::m_CERT_NAMESPACE);
-            this->writeToFile(certNamespace);
-            std::cerr << "CA Namespace: " << certNamespace << std::endl;
+	    //Set and get certificate namespace from URI 
+            this->setCertNamespaces(params.getUri(), MulticastDiscovery::m_CERT_NAMESPACE);
+            std::cerr << "CA Namespace: " << this->getCertNamespaces() << std::endl;
 
           }
           else {
@@ -186,25 +184,20 @@ Procedure::setLocalInterface(std::string localInterface)
 	m_localInterface = localInterface;
 }
 
-std::string
-Procedure::getCertNamespaces(std::string strFaceUri, std::string strTemp)
+void
+Procedure::setCertNamespaces(std::string strFaceUri, std::string strTemp)
 {
 	std::string strCertNamespaces = "";
 	strCertNamespaces = strTemp.substr((strFaceUri.length() + 2), (strTemp.length() - 1 - ((strFaceUri.length() + 2)))); 
 	
-	return strCertNamespaces;
+	m_ca_namespace = strCertNamespaces;
 }
 
-void
-Procedure::writeToFile(std::string strCertNamespace)
+std::string
+Procedure::getCertNamespaces()
 {
-	ofstream myof;
-        myof.open ("certnamespace.txt");
-  	myof << strCertNamespace;
-	myof << "\n";
-	myof.close();
+	return m_ca_namespace;
 }
-
 
 } // namespace autoconfig
 } // namespace tools

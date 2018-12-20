@@ -52,7 +52,7 @@
 std::string m_interface_name;
 int m_argc;
 char** m_argv;
-
+std::string m_ca_namespace = "";
 
 namespace ndn {
 namespace tools {
@@ -207,6 +207,8 @@ main()
       proc.runOnce();
       face.processEvents();
     }
+
+    m_ca_namespace = proc.getCertNamespaces();
   }
   catch (const std::exception& e) {
     std::cerr << ::nfd::getExtendedErrorMessage(e) << std::endl;
@@ -225,10 +227,12 @@ main()
 InvokeClient::InvokeClient() {
 }
 
-int InvokeClient::CallClientMain(std::string p_interface_name) {
+const char*
+InvokeClient::CallClientMain(std::string p_interface_name) {
 
         m_interface_name = p_interface_name;
-	return ndn::tools::autoconfig::main();
+	ndn::tools::autoconfig::main();
+	return m_ca_namespace.c_str();
 }
 //End of class method definitions
 
@@ -239,6 +243,8 @@ main(int argc, char** argv)
 	m_argv = argv;
 
 	InvokeClient cl;
-	return cl.CallClientMain("eth0");
+	cl.CallClientMain("eth0");
+	return 0;
+
   	//return ndn::tools::autoconfig::main(argc, argv);
 }

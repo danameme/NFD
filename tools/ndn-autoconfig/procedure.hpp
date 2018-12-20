@@ -65,11 +65,11 @@ public:
   void
   setLocalInterface(std::string localInterface);
 
-  std::string
-  getCertNamespaces(std::string, std::string);
-
   void
-  writeToFile(std::string);
+  setCertNamespaces(std::string, std::string);
+
+  std::string
+  getCertNamespaces();
 
 private:
   VIRTUAL_WITH_TESTS void
@@ -97,6 +97,7 @@ private:
   nfd::Controller m_controller;
   std::string m_localInterface;
   std::string m_remoteUri;
+  std::string m_ca_namespace;
 };
 
 } // namespace autoconfig
