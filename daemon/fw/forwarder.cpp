@@ -231,10 +231,11 @@ Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outF
 { 
   // check if interest is a cert request
   std::string certAuth = interest.getName().toUri();
+  Name certName(certAuth);
 
-  if(certAuth.compare("/ndn/CA")== 0){
+  if(certAuth.find("/ndn/CA") != std::string::npos){
       NFD_LOG_DEBUG("XXX Received interest for certificate XXX");
-      Interest certInterest("/ndn/CA");
+      Interest certInterest(certName);
       certInterest.setInterestLifetime(2_s);
       certInterest.setMustBeFresh(true);
       KeyChain m_keychain;
