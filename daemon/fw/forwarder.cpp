@@ -24,15 +24,18 @@
  */
 
 #include "forwarder.hpp"
-
+#include <string>
 #include "algorithm.hpp"
 #include "best-route-strategy2.hpp"
 #include "strategy.hpp"
 #include "core/logger.hpp"
 #include "table/cleanup.hpp"
-
+#include <ndn-cxx/security/signing-helpers.hpp>
 #include <ndn-cxx/lp/tags.hpp>
-
+#include <ndn-cxx/face.hpp>
+#include <ndn-cxx/security/key-chain.hpp>
+using namespace ndn::security::v2;
+using ndn::Interest;
 namespace nfd {
 
 NFD_LOG_INIT(Forwarder);
@@ -225,16 +228,41 @@ Forwarder::onContentStoreHit(const Face& inFace, const shared_ptr<pit::Entry>& p
 
 void
 Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace, const Interest& interest)
-{
-  NFD_LOG_DEBUG("onOutgoingInterest face=" << outFace.getId() <<
+{ 
+  // check if interest is a cert request
+  std::string certAuth = interest.getName().toUri();
+
+  if(certAuth.compare("/ndn/CA")== 0){
+      NFD_LOG_DEBUG("XXX Received interest for certificate XXX");
+      Interest certInterest("/ndn/CA");
+      certInterest.setInterestLifetime(2_s);
+      certInterest.setMustBeFresh(true);
+      KeyChain m_keychain;
+
+      // using test certificate for this machine
+      m_keychain.sign(certInterest,signingByCertificate(Name("/test/KEY/%83%D4%1C%10%FB%7C%DE1/self/%FD%00%00%01hD%28%5D%8A")));
+
+      // interest out-record
+      pitEntry->insertOrUpdateOutRecord(outFace, certInterest);
+      
+      // send interest
+      outFace.sendInterest(certInterest);
+      ++m_counters.nOutInterests;
+
+  }
+
+  else{
+
+      NFD_LOG_DEBUG("onOutgoingInterest face=" << outFace.getId() <<
                 " interest=" << pitEntry->getName());
 
-  // insert out-record
-  pitEntry->insertOrUpdateOutRecord(outFace, interest);
+      // insert out-record
+      pitEntry->insertOrUpdateOutRecord(outFace, interest);
 
-  // send Interest
-  outFace.sendInterest(interest);
-  ++m_counters.nOutInterests;
+      // send Interest
+      outFace.sendInterest(interest);
+      ++m_counters.nOutInterests;
+  }
 }
 
 void
@@ -545,5 +573,4 @@ Forwarder::insertDeadNonceList(pit::Entry& pitEntry, Face* upstream)
     }
   }
 }
-
 } // namespace nfd
