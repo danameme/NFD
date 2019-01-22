@@ -25,6 +25,7 @@
 
 #include "forwarder.hpp"
 #include <string>
+#include <iostream>
 #include "algorithm.hpp"
 #include "best-route-strategy2.hpp"
 #include "strategy.hpp"
@@ -234,6 +235,7 @@ Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outF
   Name certName(certAuth);
 
   if(certAuth.find("/ndn/CA") != std::string::npos){
+      std::cout << "\n\n\n Found CERT REQUEST\n\n\n";
       NFD_LOG_DEBUG("XXX Received interest for certificate XXX");
       Interest certInterest(certName);
       certInterest.setInterestLifetime(2_s);
@@ -241,11 +243,11 @@ Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outF
       KeyChain m_keychain;
 
       // using test certificate for this machine
-      m_keychain.sign(certInterest,signingByCertificate(Name("/test/KEY/%83%D4%1C%10%FB%7C%DE1/self/%FD%00%00%01hD%28%5D%8A")));
+      m_keychain.sign(certInterest,signingByCertificate(Name("/travis/KEY/%BB%E2%5E%AB0%E5j%DC/self/%FD%00%00%01hD%11%AD%A6")));
 
       // interest out-record
       pitEntry->insertOrUpdateOutRecord(outFace, certInterest);
-      
+      std::cout << interest << std::endl;
       // send interest
       outFace.sendInterest(certInterest);
       ++m_counters.nOutInterests;
