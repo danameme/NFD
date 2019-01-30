@@ -234,16 +234,16 @@ Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outF
   std::string certAuth = interest.getName().toUri();
   Name certName(certAuth);
 
-  if(certAuth.find("/ndn/CA") != std::string::npos){
+  if(certAuth.find("/CA") != std::string::npos){
       std::cout << "\n\n\n Found CERT REQUEST\n\n\n";
       NFD_LOG_DEBUG("XXX Received interest for certificate XXX");
       Interest certInterest(certName);
       certInterest.setInterestLifetime(2_s);
       certInterest.setMustBeFresh(true);
-      KeyChain m_keychain;
+      KeyChain m_keyChain;
 
       // using test certificate for this machine
-      m_keychain.sign(certInterest,signingByCertificate(Name("/travis/KEY/%BB%E2%5E%AB0%E5j%DC/self/%FD%00%00%01hD%11%AD%A6")));
+      m_keyChain.sign(certInterest,signingByCertificate(Name("/test/KEY/%BB%E2%5E%AB0%E5j%DC/self/%FD%00%00%01hD%11%AD%A6")));
 
       // interest out-record
       pitEntry->insertOrUpdateOutRecord(outFace, certInterest);
@@ -254,6 +254,7 @@ Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outF
 
   }
 
+  // Forward as normal
   else{
 
       NFD_LOG_DEBUG("onOutgoingInterest face=" << outFace.getId() <<
