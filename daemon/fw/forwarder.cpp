@@ -229,12 +229,13 @@ Forwarder::onContentStoreHit(const Face& inFace, const shared_ptr<pit::Entry>& p
 
 void
 Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace, const Interest& interest)
-{   	
+{	
   // check if interest is a cert request
   std::string certAuth = interest.getName().toUri();
   Name certName(certAuth);
 
-  if(certAuth.find("/CA/_PROBE") != std::string::npos){
+  //Sign NDN-Cert Probe and Download Interests for Location Based Certificates
+  if((certAuth.find("/CA/_PROBE") != std::string::npos) || (certAuth.find("/CA/_DOWNLOAD") != std::string::npos)){
 
       // received certificate request Interest
       NFD_LOG_DEBUG("Received interest for certificate!");
