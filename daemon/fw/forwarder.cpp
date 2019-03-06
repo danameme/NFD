@@ -84,8 +84,29 @@ Forwarder::~Forwarder() = default;
 
 void
 Forwarder::onIncomingInterest(Face& inFace, const Interest& interest)
-{
-  // receive Interest
+{ 	
+
+  // Hardcoded: Check to see if client signature matches AP namespace for testApp Application
+  
+  // Check to see if interest matches testApp namespace
+  if(interest.getName().toUri().find("/example/testApp") != std::string::npos){
+
+       // Check for AP identity in signature, if it matches, proceed. If not, send Nack for InvalidCert
+       if(interest.getName().toUri().find("AP214") != std::string::npos){
+           std::cout << "Name matches!!!\n";
+       } 
+	
+       else{ 
+           lp::Nack nack(interest);
+	   nack.setReason(lp::NackReason::INVALID_CERT);
+	   inFace.sendNack(nack);
+	   return;
+
+       }
+
+  }
+
+	  // receive Interest
   NFD_LOG_DEBUG("onIncomingInterest face=" << inFace.getId() <<
                 " interest=" << interest.getName());
   interest.setTag(make_shared<lp::IncomingFaceIdTag>(inFace.getId()));
@@ -256,6 +277,7 @@ Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outF
       outFace.sendInterest(certInterest);
       ++m_counters.nOutInterests;
   }
+  
   else{
       // Forward as normal (Interest not signed)
       NFD_LOG_DEBUG("onOutgoingInterest face=" << outFace.getId() <<
