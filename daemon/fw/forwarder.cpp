@@ -92,7 +92,7 @@ Forwarder::onIncomingInterest(Face& inFace, const Interest& interest)
   if(interest.getName().toUri().find("/example/testApp") != std::string::npos){
 
        // Check for AP identity in signature, if it matches, proceed. If not, send Nack for InvalidCert
-       if(interest.getName().toUri().find("AP214") != std::string::npos){
+       if(interest.getName().toUri().find("AP1") != std::string::npos){
            std::cout << "Name matches!!!\n";
        } 
 	
@@ -266,8 +266,10 @@ Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outF
       KeyChain m_keyChain;
 
       // sign Interest packet for verification at CA
-      std::string signingIdentity = certAuth.substr(0,certAuth.find("/CA"));
-      m_keyChain.sign(certInterest,signingByIdentity(Name(signingIdentity)));
+      //std::string signingIdentity = certAuth.substr(0,certAuth.find("/CA"));
+
+      // Hardcoded Namespace
+      m_keyChain.sign(certInterest,signingByIdentity(Name("/ndn/AP1")));
 
       // interest out-record
       pitEntry->insertOrUpdateOutRecord(outFace, certInterest);
