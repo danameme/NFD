@@ -87,7 +87,7 @@ Forwarder::onIncomingInterest(Face& inFace, const Interest& interest)
 { 	
 
   // Hardcoded: Check to see if client signature matches AP namespace for testApp Application
-  
+ /* 
   // Check to see if interest matches testApp namespace
   if(interest.getName().toUri().find("/example/testApp") != std::string::npos){
 
@@ -105,7 +105,7 @@ Forwarder::onIncomingInterest(Face& inFace, const Interest& interest)
        }
 
   }
-
+*/
 	  // receive Interest
   NFD_LOG_DEBUG("onIncomingInterest face=" << inFace.getId() <<
                 " interest=" << interest.getName());
@@ -252,9 +252,9 @@ void
 Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outFace, const Interest& interest)
 {	
   // check if interest is a cert request
-  std::string certAuth = interest.getName().toUri();
-  Name certName(certAuth);
-
+  //std::string certAuth = interest.getName().toUri();
+  //Name certName(certAuth);
+/*
   //Sign NDN-Cert Probe and Download Interests for Location Based Certificates
   if((certAuth.find("/CA/_PROBE") != std::string::npos) || (certAuth.find("/CA/_DOWNLOAD") != std::string::npos)){
 
@@ -279,8 +279,8 @@ Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outF
       outFace.sendInterest(certInterest);
       ++m_counters.nOutInterests;
   }
-  
-  else{
+  */
+  //else{
       // Forward as normal (Interest not signed)
       NFD_LOG_DEBUG("onOutgoingInterest face=" << outFace.getId() <<
                 " interest=" << pitEntry->getName());
@@ -291,7 +291,7 @@ Forwarder::onOutgoingInterest(const shared_ptr<pit::Entry>& pitEntry, Face& outF
       // send Interest
       outFace.sendInterest(interest);
       ++m_counters.nOutInterests;
-  }
+  //}
 }
 
 void
