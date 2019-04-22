@@ -231,6 +231,13 @@ def build(bld):
 
     bld.install_files('${SYSCONFDIR}/ndn', 'autoconfig.conf.sample')
 
+    bld.install_files(
+        "%s/NFD" % bld.env['INCLUDEDIR'],
+        bld.path.ant_glob(['tools/ndn-autoconfig/*.hpp']),
+        cwd = bld.path.find_dir("tools"),
+        relative_trick = True,
+        )
+
     bld.shlib(source=[
         "tools/ndn-autoconfig/main.cpp",
         "tools/ndn-autoconfig/procedure.cpp",
