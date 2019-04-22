@@ -242,7 +242,7 @@ def build(bld):
         "tools/ndn-autoconfig/dns-srv.cpp",
         "tools/ndn-autoconfig/c-wrapper.cpp"
 	], 
-	target="autodiscoverycwrapper", includes=["tools"], cxxflags="-g -Wall -O0", 
+	target="autodiscoveryshlib", includes=["tools"], cxxflags="-g -Wall -O0", 
 	use=["core-objects"])
 
 def docs(bld):

@@ -39,6 +39,7 @@
 #include <ndn-cxx/util/time.hpp>
 
 #include "invoke-client.hpp"
+#include "auto-client-shlib.hpp"
 
 // suppress warning caused by boost::program_options::parse_config_file
 #ifdef __clang__
@@ -235,6 +236,20 @@ InvokeClient::CallClientMain(std::string p_interface_name) {
 	return m_ca_namespace.c_str();
 }
 //End of class method definitions
+
+
+//Define class method for client C++ shared library
+AutoClientShLib::AutoClientShLib() {
+}
+
+std::string
+AutoClientShLib::RunAutoClient(std::string p_interface_name) {
+        m_interface_name = p_interface_name;
+        ndn::tools::autoconfig::main();
+        return m_ca_namespace;
+}
+//End of class method definitions for C++ shared library
+
 
 int
 main(int argc, char** argv)
